@@ -1,0 +1,25 @@
+{
+  "name": "wddeviceswrapper",
+  "version": "1.0.0",
+  "description": "WEDO Domo: single IoTCS wrapper for multiples devices",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oraclespainpresales/wdDevicesWrapper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oraclespainpresales/wdDevicesWrapper/issues"
+  },
+  "homepage": "https://github.com/oraclespainpresales/wdDevicesWrapper#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "lodash": "^4.17.5",
+    "npmlog-ts": "0.0.1"
+  }
+}
