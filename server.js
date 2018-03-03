@@ -133,7 +133,7 @@ async.series( {
       if (err) {
         log.error(PROCESS, err);
       } else {
-        log.info(PROCESS, "All registered devices successfully initialized in IoTCS");
+        log.info(PROCESS, "All registered devices successfully initialized in IoTCS.");
         next(null);
       }
     });
