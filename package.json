@@ -20,6 +20,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "lodash": "^4.17.5",
+    "mail-listener2": "^0.3.1",
     "npmlog-ts": "0.0.1"
   }
 }

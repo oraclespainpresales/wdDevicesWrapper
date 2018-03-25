@@ -1,11 +1,10 @@
 'use strict';
-
 const log = require('npmlog-ts')
+    , globals  = require('./globals')()
     , fs = require('fs')
     , _ = require('lodash')
     , async = require('async')
     , Device = require('./device')
-    , globals = require('./globals')()
     , dcl = require('./device-library.node')
 ;
 
@@ -104,7 +103,6 @@ async.series( {
           async.eachSeries(dev.getUrn(), (urn, nextUrn) => {
             getModel(dev.getIotDcd(), urn, ((error, model) => {
               if (error !== null) {
-                mainStatus = "ERRMOD";
                 log.error(IOTCS, "Error in retrieving '" + urn + "' model. Error: " + error.message);
                 nextUrn(error);
               } else {
@@ -123,7 +121,8 @@ async.series( {
         }
       }, (err, results) => {
         if (err) {
-          log.error("Error during initialization: " + err);
+          log.error(IOTCS, "Error during initialization: " + err);
+          nextDevice(err);
         } else {
           d.device.setDevice(dev);
           nextDevice(null);
@@ -132,6 +131,7 @@ async.series( {
     }, err => {
       if (err) {
         log.error(PROCESS, err);
+        next(err);
       } else {
         log.info(PROCESS, "All registered devices successfully initialized in IoTCS.");
         next(null);

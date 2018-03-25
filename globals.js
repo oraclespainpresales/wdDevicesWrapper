@@ -9,6 +9,6 @@ module.exports = function() {
   global.DEVICEFILE    = 'device.conf';
   global.CONFIGFILE    = 'config.json';
   global.DEVICEFILES   = [ 'main.js', DEVICEFILE, CONFIGFILE ];
-  global.DEVICEMETHODS = [ 'init', 'getDeviceFilename', 'getConfig', 'setDevice', 'getDevice', 'startListenDevice' ];
+  global.DEVICEMETHODS = [ 'init', 'getDeviceFilename', 'getConfig', 'setDevice', 'getDevice', 'startListenDevice', 'stopListenDevice' ];
 
 }
