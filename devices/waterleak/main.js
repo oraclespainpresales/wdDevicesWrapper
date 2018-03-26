@@ -23,14 +23,17 @@ module.exports = function(l)
     if (!waterLeakMailListener) return;
     waterLeakMailListener.on("server:connected", () => {
       LOG.verbose(MODULE, "'%s' server connected with username '%s'", config.HOSTLISTENER, config.USERMAIL);
+/**
       if (retryTimer) {
         clearInternal(retryTimer);
         retryTimer = _.noop();
         retries = 0;
       }
+**/
     });
     waterLeakMailListener.on("server:disconnected", () => {
       LOG.verbose(MODULE, "'%s' server disconnected", config.HOSTLISTENER);
+/**
       waterLeakMailListener.stop();
       if (!retryTimer) {
         retries = MAXRETRIES;
@@ -44,6 +47,7 @@ module.exports = function(l)
           }
         }, DELAY * 1000);
       }
+**/
     });
     waterLeakMailListener.on("error", err => {
       LOG.error(MODULE, err);
