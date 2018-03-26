@@ -1,7 +1,7 @@
 "use strict";
 
 const _ = require('lodash')
-    , MailListener = require("mail-listener2")
+    , MailListener = require("mail-listener-fixed")
 ;
 
 module.exports = function(l)
