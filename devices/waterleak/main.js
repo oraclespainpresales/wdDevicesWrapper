@@ -108,7 +108,7 @@ module.exports = function(l)
           tls: config.TLS,
           connTimeout: config.CNXTIMEOUT, // Default by node-imap
           authTimeout: config.AUTHTIMEOUT, // Default by node-imap,
-          debug: console.log, //console.log, // Or your custom function with only one incoming argument. Default: null
+          debug: null, //console.log, // Or your custom function with only one incoming argument. Default: null
           tlsOptions: { rejectUnauthorized: false },
           mailbox: config.MAILBOX, // mailbox to monitor
           searchFilter: ["UNSEEN"], // the search filter being used after an IDLE notification has been retrieved
