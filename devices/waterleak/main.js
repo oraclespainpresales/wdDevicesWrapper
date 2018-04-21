@@ -33,6 +33,8 @@ module.exports = function(l)
     });
     waterLeakMailListener.on("server:disconnected", () => {
       LOG.verbose(MODULE, "'%s' server disconnected", config.HOSTLISTENER);
+      LOG.verbose(MODULE, "Trying to restart connection...");
+      waterLeakMailListener.restart();
 /**
       waterLeakMailListener.stop();
       if (!retryTimer) {
