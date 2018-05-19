@@ -6,7 +6,7 @@ const _ = require('lodash')
 
 module.exports = function(l)
 {
-  const MODULE       = "WATERLEAK"
+  const MODULE       = "WATERLEAKINDUSTRY"
       , LOG          = l
       , MYDEVICEFILE = __dirname + '/' + DEVICEFILE
       , MAXRETRIES   = 999
@@ -74,7 +74,7 @@ module.exports = function(l)
             let vd = device.getIotVd(config.urn[0]);
             if (vd) {
               let alert = vd.createAlert(config.urnalert);
-              if (alert) {
+              if (alert) {º
                 alert.fields.timestamp = Date.now();
                 alert.fields.subject   = mail.subject;
                 alert.raise();
