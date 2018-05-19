@@ -74,7 +74,7 @@ module.exports = function(l)
             let vd = device.getIotVd(config.urn[0]);
             if (vd) {
               let alert = vd.createAlert(config.urnalert);
-              if (alert) {º
+              if (alert) {
                 alert.fields.timestamp = Date.now();
                 alert.fields.subject   = mail.subject;
                 alert.raise();
