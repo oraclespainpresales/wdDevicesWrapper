@@ -6,7 +6,7 @@ const _ = require('lodash')
 
 module.exports = function(l)
 {
-  const MODULE       = "WATERLEAK"
+  const MODULE       = "MOTIONDETECTOR"
       , LOG          = l
       , MYDEVICEFILE = __dirname + '/' + DEVICEFILE
       , MAXRETRIES   = 999
@@ -16,7 +16,7 @@ module.exports = function(l)
     , device = _.noop()
     , retries = 0
     , retryTimer = _.noop()
-    , waterLeakMailListener = _.noop()
+    , motionDetectorMailListener = _.noop()
   ;
 
   return {
@@ -52,10 +52,6 @@ module.exports = function(l)
       }
     },
     sendEvent(o) {
-      let pos = o.data.body.search(config.WLBODYPATTERN);
-      let split = o.data.body.substring(pos, pos +  config.WLMESSAGELENGTH).split(" ");
-      let date = split[14] + "%20" + split[15] + "%20" + split[16];
-      let time = split[12];
       // Send to IoTCS
       if (device) {
         let vd = device.getIotVd(config.urn[0]);
@@ -63,7 +59,6 @@ module.exports = function(l)
           let alert = vd.createAlert(config.urnalert);
           if (alert) {
             alert.fields.timestamp = Date.now();
-            alert.fields.subject   = o.data.subject;
             alert.raise();
             LOG.info(MODULE, "IOTCS '%s' alert raised successfully", config.urn);
           } else {

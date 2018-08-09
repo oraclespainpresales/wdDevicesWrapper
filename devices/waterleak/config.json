@@ -3,13 +3,6 @@
   "urnalert": "urn:com:oracle:iot:device:honeywell:waterleak:waterleak",
   "storePassword": "Welcome1",
   "USERMAIL": "wedodomo.madrid@gmail.com",
-  "PASSWORD": "oc4j1013",
-  "HOSTLISTENER": "imap.gmail.com",
-  "PORT": 993,
-  "TLS": true,
-  "MAILBOX": "INBOX",
-  "CNXTIMEOUT": 10000,
-  "AUTHTIMEOUT": 5000,
   "WLSUBJECTPATTERN": "Fuga de agua - Detectado",
   "WLBODYPATTERN": "Fuga de agua detectada",
   "WLMESSAGELENGTH": 96

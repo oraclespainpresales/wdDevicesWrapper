@@ -11,7 +11,25 @@ const log = require('npmlog-ts')
 log.timestamp = true;
 log.level     = 'verbose';
 
-let devices = [];
+// Main handlers registration - BEGIN
+// Main error handler
+process.on('uncaughtException', function (err) {
+  console.log("Uncaught Exception: " + err);
+  console.log("Uncaught Exception: " + err.stack);
+});
+process.on('SIGINT', function() {
+  log.info(PROCESS, "Caught interrupt signal");
+  log.info(PROCESS, "Exiting gracefully");
+  process.removeAllListeners()
+  if (typeof err != 'undefined')
+    log.error(PROCESS, err)
+  process.exit(2);
+});
+// Main handlers registration - END
+
+let devices    = []
+  , collectors = []
+;
 
 // IoTCS helpers BEGIN
 function getModel(device, urn, callback) {
@@ -26,26 +44,65 @@ function getModel(device, urn, callback) {
 
 async.series( {
   splash: next => {
-    log.info(PROCESS, "WEDO Domo - Device Handler - 1.0");
+    log.info(PROCESS, "WEDO Domo - Device Handler - " + VERSION);
     log.info(PROCESS, "Author: Carlos Casares <carlos.casares@oracle.com>");
     next(null);
+  },
+  registerCollectors: next => {
+    // Register all available data collectors
+    if (!fs.existsSync(COLLECTORS)) {
+      // No "COLLECTORS" subfolder. Cannot continue
+      log.error(PROCESS, "No '%s' subfolder found. Aborting!", COLLECTORS);
+      process.exit(-1);
+    }
+    async.eachSeries(fs.readdirSync(COLLECTORS), (name, nextCollector) => {
+      const collectorFolder = './' + COLLECTORS + '/' + name + '/';
+      validateCollector(collectorFolder)
+        .then( () => {
+          var c = {
+            name: name,
+            collector: require(collectorFolder + MAIN)(log)
+          };
+          validateCollector(c.collector)
+            .then (() => {
+              log.verbose(name.toUpperCase(), "Collector '%s' successfully validated", name);
+              collectors.push(c);
+              nextCollector(null);
+            })
+            .catch(error => { log.error(name.toUpperCase(), error); nextCollector(null); })
+          ;
+        })
+        .catch(error => { log.error(name.toUpperCase(), error); nextCollector(null); })
+      ;
+    }, err => {
+      if (err) {
+        log.error(PROCESS, err);
+      } else {
+        if (collectors.length == 0) {
+          next("No collectors registered. Aborting.");
+        } else {
+          log.info(PROCESS, "All collectors successfully registered (%d)", collectors.length);
+          next(null);
+        }
+      }
+    });
   },
   registerDevices: next => {
     // Register all available devices
     if (!fs.existsSync(DEVICES)) {
-      // No "devices" subfolder. Cannot continue
+      // No "DEVICES" subfolder. Cannot continue
       log.error(PROCESS, "No '%s' subfolder found. Aborting!", DEVICES);
       process.exit(-1);
     }
     async.eachSeries(fs.readdirSync(DEVICES), (name, nextDevice) => {
       const deviceFolder = './' + DEVICES + '/' + name + '/';
-      validate(deviceFolder)
+      validateDevice(deviceFolder)
         .then( () => {
           var d = {
             name: name,
             device: require(deviceFolder + MAIN)(log)
           };
-          validate(d.device)
+          validateDevice(d.device)
             .then (() => {
               log.verbose(name.toUpperCase(), "Device '%s' successfully validated", name);
               devices.push(d);
@@ -60,12 +117,17 @@ async.series( {
       if (err) {
         log.error(PROCESS, err);
       } else {
-        log.info(PROCESS, "All devices successfully registered (%d)", devices.length);
-        next(null);
+        if (devices.length == 0) {
+          next("No devices registered. Aborting.");
+        } else {
+          log.info(PROCESS, "All devices successfully registered (%d)", devices.length);
+          next(null);
+        }
       }
     });
   },
   iot: next => {
+    // Go through all existing devices to "start" them
     async.eachSeries(devices, (d, nextDevice) => {
       var dev = new Device(d.name.toUpperCase(), log);
       dev.setStoreFile(d.device.getDeviceFilename(), d.device.getConfig().storePassword);
@@ -138,6 +200,22 @@ async.series( {
       }
     });
   },
+  initCollectors: next => {
+    async.eachSeries(collectors, (c, nextCollector) => {
+      c.collector.init()
+        .then(() => { nextCollector(null) })
+        .catch( err => { log.error(c.name.toUpperCase(), err); nextCollector(null) })
+      ;
+    }, err => {
+      if (err) {
+        log.error(PROCESS, err);
+        next(err);
+      } else {
+        log.info(PROCESS, "All registered collectors successfully initialized");
+        next(null);
+      }
+    });
+  },
   initDevices: next => {
     async.eachSeries(devices, (d, nextDevice) => {
       d.device.init()
@@ -153,25 +231,54 @@ async.series( {
       }
     });
   },
-  getData: next => {
-    async.eachSeries(devices, (d, nextDevice) => {
-      log.info(PROCESS, "Start gathering data from device '%s'", d.name.toUpperCase());
-      d.device.startListenDevice()
-        .then(() => { nextDevice(null) })
-        .catch( err => { log.error(d.name.toUpperCase(), err); nextDevice(null) })
+  startCollectors: next => {
+    async.eachSeries(collectors, (c, nextCollector) => {
+      c.collector.setDevices(devices);
+      c.collector.start()
+        .then(() => { nextCollector(null) })
+        .catch( err => { log.error(c.name.toUpperCase(), err); nextCollector(null) })
       ;
     }, err => {
       if (err) {
         log.error(PROCESS, err);
+        next(err);
       } else {
-        log.info(PROCESS, "All registered devices listening to data...");
+        log.info(PROCESS, "All registered collectors successfully started");
         next(null);
       }
     });
   }
+}, err => {
+  if (err) {
+    log.error(PROCESS, err);
+  }
 });
 
-function validate(p) {
+function validateCollector(p) {
+  if ( _.isString(p)) {
+    // Checking subfolder mandatory files
+    return new Promise((resolve, reject) => {
+      _.each(COLLECTORFILES, f => {
+        if (!fs.existsSync(p + f)) {
+          reject("Invalid collector folder. File '" + f + "' is missing. Ignoring collector.");
+        }
+      });
+      resolve();
+    });
+  } else if (_.isObject(p)) {
+    // Checking mandatory methods
+    return new Promise((resolve, reject) => {
+      _.each(COLLECTORMETHODS, m => {
+        if (typeof p[m] !== 'function') {
+          reject("Invalid collector. Method '" + m + "()' is missing. Ignoring collector.");
+        }
+      });
+      resolve();
+    });
+  }
+}
+
+function validateDevice(p) {
   if ( _.isString(p)) {
     // Checking subfolder mandatory files
     return new Promise((resolve, reject) => {

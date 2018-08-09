@@ -1,0 +1,9 @@
+{
+  "urn": [ "urn:com:oracle:iot:device:wattio:motiondetector" ],
+  "urnalert": "urn:com:oracle:iot:device:wattio:motiondetector:movement",
+  "storePassword": "Welcome1",
+  "USERMAIL": "wedodomo.madrid@gmail.com",
+  "WLSUBJECTPATTERN": "Alerta Movimiento detectado de tu sistema Wattio",
+  "WLBODYPATTERN": "(WedoGarage)",
+  "WLMESSAGELENGTH": 90
+}

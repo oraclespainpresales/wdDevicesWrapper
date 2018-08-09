@@ -20,7 +20,8 @@
   "dependencies": {
     "async": "^2.6.0",
     "lodash": "^4.17.5",
-    "mail-listener-fixed": "^1.1.0",
-    "npmlog-ts": "0.0.1"
+    "mail-listener2-updated": "^0.3.3",
+    "npmlog-ts": "0.0.1",
+    "restify-clients": "^2.5.0"
   }
 }
