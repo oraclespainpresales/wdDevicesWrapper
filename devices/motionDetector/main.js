@@ -70,20 +70,6 @@ module.exports = function(l)
       } else {
         LOG.error(MODULE, "Unable to raise alert. Undefined IoTCS device");
       }
-    },
-    startListenDevice() {
-      return new Promise((resolve, reject) => {
-        LOG.verbose(MODULE, "Start polling for data...");
-        waterLeakMailListener.start();
-        resolve();
-      });
-    },
-    stopListenDevice() {
-      return new Promise((resolve, reject) => {
-        LOG.verbose(MODULE, "Stop polling for data...");
-        waterLeakMailListener.stop();
-        resolve();
-      });
     }
   }
 }

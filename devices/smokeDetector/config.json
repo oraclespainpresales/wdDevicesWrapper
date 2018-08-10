@@ -1,0 +1,7 @@
+{
+  "urn": [ "urn:com:oracle:iot:device:nest:smokefire" ],
+  "urnalert": "urn:com:oracle:iot:device:nest:smokefire:alarmsmoke",
+  "storePassword": "Welcome1",
+  "USERMAIL": "wedodomo.madrid@gmail.com",
+  "WLSUBJECTPATTERN": "Kitchen (Kitchen) detects a"
+}
