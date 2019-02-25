@@ -76,6 +76,7 @@ module.exports = function(l)
           getDemozones: next => {
             // Get all current demozones
             apex.get(DEMOZONESURI, function(err, req, res, obj) {
+              console.log(obj)
               var jBody = JSON.parse(res.body);
               if (err) {
                 next(err.message);
